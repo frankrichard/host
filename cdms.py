@@ -584,7 +584,7 @@ for i in files_location:
             
             #using branch codes
             
-            branch_codes = pd.read_excel('branch_code.xlsx')
+            branch_codes = pd.read_excel('branch_code.xlsx',engine = 'openpyxl')
             
             branch_codes1 = dict(list(zip(branch_codes['PEPP Code'],branch_codes['Partner Name'])))
             
