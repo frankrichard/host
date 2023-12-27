@@ -8,6 +8,8 @@ Created on Wed Dec 13 19:13:28 2023
 
 import pandas as pd
 
+import traceback
+
 import hashlib
 
 import json
@@ -784,7 +786,9 @@ for i in files_location:
                 
     except Exception as e:
     
-        print(str(e))                
+        print(str(e))            
+        
+        print(traceback.print_exc())
                 
             
         count = count+1
