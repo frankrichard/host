@@ -550,7 +550,7 @@ for i in files_location:
                 
                 df[column] = df[column].apply(lambda x: unidecode(str(x)) if pd.notnull(x) else x)
                 
-                df[column] = df[column].str.replace(',','\,')
+                df[column] = df[column].str.replace(',',';')
                 
 
             
@@ -1148,12 +1148,16 @@ final_df['PRIMARYID'] = ''
 
 
 
+headers_final = list(headers.values())
 
+headers_final.append('HASH_1')
 
-final_df = final_df[list(headers.values())]
+headers_final.append('HASH_2')
+
+final_df = final_df[headers_final]
 
     
-final_df.to_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv",index  = False, quoting=csv.QUOTE_NONE)
+final_df.to_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv",index  = False)
 
 # duplicate_hash.to_csv('invalid//duplicates_'+business.loc[i,'File Name'],index  = False)
 
