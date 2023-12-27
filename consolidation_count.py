@@ -51,7 +51,7 @@ for i in range(0,len(files_location)):
     
 df.to_csv('index.csv',index = False)
 
-df = df.drop_cuplicates(['Path'])
+df = df.drop_duplicates(['Path'])
 
 df.index = df['Path']
 
@@ -61,7 +61,11 @@ for i in files_location:
     
     some = i.replace('valid/CSDMS_output.csv','').replace('invalid/CDMS_output.csv','').replace('invalid/corporate_customers.csv','')
     
+    print(i)
+    
     if i.endswith('valid/CDMS_output.csv'):
+        
+        print('valid')
         
         valid = pd.read_csv(i)
         
@@ -69,11 +73,15 @@ for i in files_location:
     
     elif i.endswith('invalid/CDMS_output.csv'):
         
+        print('invalid')
+        
         invalid = pd.read_csv(i)
         
         df.loc[some,'invalid'] = len(invalid)
     
     elif i.endswith('invalid/corporate_customers.csv'):
+        
+        print('corporate')
         
         corporate = pd.read_csv(i)
         

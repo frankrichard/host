@@ -504,6 +504,7 @@ for i in files_location:
     
     
             
+
              
             
             df[config['FirstName']] = df[config['FirstName']].str.upper()   
@@ -533,6 +534,12 @@ for i in files_location:
     
     
             #change_accent
+            
+            for column in df.columns:
+                
+                df[column] = df[column].str.unidecode()
+
+            
             
             df = df.apply(lambda row:change_accent(row),axis = 1)
             
