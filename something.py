@@ -564,9 +564,6 @@ for i in files_location:
 
             #email validation
             
-            for column in errored_headers:
-                
-                df[column+'_error'] = df[column]
                 
                 
             
@@ -1177,6 +1174,11 @@ headers_final.append('HASH_2')
 
 
 final_df.fillna('',inplace = True)
+
+
+for column in errored_headers:
+    
+    final_df[column+'_error'] = final_df[column]
 
 
 errored_df = final_df[(((final_df['EMAIL']=='') & (final_df['EMAIL_error']!='')) | ((final_df['LANDLINE_NO']=='') & (final_df['LANDLINE_NO_error']!='')) | ((final_df['EXPIRYDATE']=='') & (final_df['EXPIRYDATE_error']!='')) | ((final_df['LOAD_DT']=='') & (final_df['LOAD_DT_error']!='')) |((final_df['DATEOFBIRTH']=='') & (final_df['DATEOFBIRTH_error']!='')))]
