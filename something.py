@@ -965,7 +965,7 @@ for i in files_location:
                 
                 hash_codes = final_df['HASH_1'][(xy*500):((xy*500)+500)]
             
-                body = {"hashCodes":hash_codes}
+                body = {"hashCodes":list(hash_codes)}
             
                 response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
             
@@ -988,7 +988,7 @@ for i in files_location:
             
             hash_codes = final_df[(len(final_df)//500)*500:]
             
-            body = {"hashCodes":hash_codes}
+            body = {"hashCodes":list(hash_codes)}
             
             response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
             
@@ -1012,7 +1012,7 @@ for i in files_location:
                 
                 hash_codes = final_df['HASH_2'][(xy*500):((xy*500)+500)]
             
-                body = {"hashCodes":hash_codes}
+                body = {"hashCodes":list(hash_codes)}
             
                 response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
             
@@ -1035,7 +1035,7 @@ for i in files_location:
             
             hash_codes = final_df[(len(final_df)//500)*500:]
             
-            body = {"hashCodes":hash_codes}
+            body = {"hashCodes":list(hash_codes)}
             
             response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
             
