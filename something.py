@@ -1177,7 +1177,12 @@ final_df = pd.read_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv
 final_df.fillna('',inplace = True)
 
 
+
+final_df['Remarks_y'] = ''
+
 final_df.to_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv",index  = False)
+
+
 
 
 # duplicate_hash.to_csv('invalid//duplicates_'+business.loc[i,'File Name'],index  = False)
