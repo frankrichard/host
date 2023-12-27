@@ -489,7 +489,11 @@ for i in files_location:
             
             df = CDMS_output.copy()
             
-            df['floki_changes'] = ''
+            df['floki changes'] = ''
+            
+            
+            
+            errored_headers = ['EMAIL','LANDLINE_NO','EXPIRYDATE','LOAD_DT','ISSUEDATE','DATEOFBIRTH']
             
             print('Input file Length')
             
@@ -557,15 +561,25 @@ for i in files_location:
             
             df = df.apply(lambda row:change_accent(row),axis = 1)
             
+
             #email validation
             
-            df.loc[~(df['EMAIL'].str.contains(email_regex)),'floki changes']= 'invalid Email so replaced as null;'
+            for column in errored_headers:
+                
+                df[errored_headers[i]+'_error'] = df[errored_headers[i]]
+                
+                
             
+            df.loc[~(df['EMAIL'].str.contains(email_regex)),'floki changes']= 'invalid Email so replaced as null;'
+                        
             df['EMAIL']= df[df['EMAIL'].str.contains(email_regex, na=False)]['EMAIL']
             
             #landline number validation
             
+            df['LANDLINE_CHECK'] = df['LANDLINE_NO']
+            
             df['LANDLINE_NO'] = pd.to_numeric(df['LANDLINE_NO'],errors = 'coerce')
+            
             
             df.loc[df['LANDLINE_NO'].isna(),'floki changes'] += 'invalid landline no;'
 
@@ -573,6 +587,8 @@ for i in files_location:
             #date format
             
             df.rename(columns = {'EXPIRYDATE_x':'EXPIRYDATE','LOAD_DT_x':'LOAD_DT'},inplace = True)            
+            
+            
             
             df['ISSUEDATE'] = pd.to_datetime(df['ISSUEDATE'],format = '%m/%d/%Y %I:%M:%S %p',errors = 'coerce')
 
@@ -606,6 +622,7 @@ for i in files_location:
 
             df.loc[df['LOAD_DT']=='','floki_changes']+='LOAD_DT not in format or empty;'
 
+                        
 
 
 
@@ -1158,9 +1175,14 @@ headers_final.append('HASH_1')
 
 headers_final.append('HASH_2')
 
-errored_df = final_df[~final_df['floki changes'].isna()]
+
+final_df.fillna('',inplace = True)
+
+
+errored_df = final_df[(((final_df['EMAIL']=='') & (final_df['EMAIL_error']!='')) | ((final_df['LANDLINE_NO']=='') & (final_df['LANDLINE_NO_error']!='')) | ((final_df['EXPIRYDATE']=='') & (final_df['EXPIRYDATE_error']!='')) | ((final_df['LOAD_DT']=='') & (final_df['LOAD_DT_error']!='')) |((final_df['DATEOFBIRTH']=='') & (final_df['DATEOFBIRTH_error']!='')))]
 
 errored_df.to_csv('/STFS0029M/migration_data/overall/valid//errored_out_changes.csv')
+
 
 final_df = final_df[headers_final]
 
@@ -1179,6 +1201,8 @@ final_df.fillna('',inplace = True)
 
 
 final_df['Remarks_y'] = ''
+
+
 
 final_df.to_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv",index  = False)
 
