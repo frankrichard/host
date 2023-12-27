@@ -8,6 +8,8 @@ Created on Wed Dec 13 19:13:28 2023
 
 import pandas as pd
 
+import csv
+
 import traceback
 
 import hashlib
@@ -557,45 +559,46 @@ for i in files_location:
             
             #email validation
             
-            df.loc[~(df['EMAIL'].str.contains(email_regex)),'floki changes']= 'invalid Email so replaced as null'
+            df.loc[~(df['EMAIL'].str.contains(email_regex)),'floki changes']= 'invalid Email so replaced as null;'
             
             df['EMAIL']= df[df['EMAIL'].str.contains(email_regex, na=False)]['EMAIL']
 
 
             #date format
             
-            df.rename(columns = {'EXPIRYDATE_x':'EXPIRYDATE','LOAD_DT_x':'LOAD_DT'},inplace = True)
-
-            
+            df.rename(columns = {'EXPIRYDATE_x':'EXPIRYDATE','LOAD_DT_x':'LOAD_DT'},inplace = True)            
             
             df['ISSUEDATE'] = pd.to_datetime(df['ISSUEDATE'],format = '%m/%d/%Y %I:%M:%S %p',errors = 'coerce')
 
             df['ISSUEDATE'] = df['ISSUEDATE'].dt.strftime('%m/%d/%Y')
             
-            df['ISSUEDATE'].fillna('')
+            df['ISSUEDATE'].fillna('',inplace = True)
 
             df['EXPIRYDATE'] = pd.to_datetime(df['EXPIRYDATE'],format = '%m/%d/%Y %I:%M:%S %p',errors = 'coerce')
 
             df['EXPIRYDATE'] = df['EXPIRYDATE'].dt.strftime('%m/%d/%Y')
             
-            df['EXPIRYDATE'].fillna('')
+            df['EXPIRYDATE'].fillna('',inplace = True)
 
             df['DATEOFBIRTH'] = pd.to_datetime(df['DATEOFBIRTH'],format = '%m/%d/%Y %I:%M:%S %p',errors = 'coerce')
 
             df['DATEOFBIRTH'] = df['DATEOFBIRTH'].dt.strftime('%m/%d/%Y')
             
-            df['DATEOFBIRTH'].fillna('')
+            df['DATEOFBIRTH'].fillna('',inplace = True)
 
             df['LOAD_DT'] = pd.to_datetime(df['LOAD_DT'],format = '%m/%d/%Y %I:%M:%S %p',errors = 'coerce')
 
             df['LOAD_DT'] = df['LOAD_DT'].dt.strftime('%m/%d/%Y')
             
-            df['LOAD_DT'].fillna('')
+            df['LOAD_DT'].fillna('',inplace = True)
 
+            df.loc[df['ISSUEDATE']=='','floki_changes']+='issuedate not in format or empty;'
 
+            df.loc[df['EXPIRYDATE']=='','floki_changes']+='expiry date not in format or empty;'
 
+            df.loc[df['DATEOFBIRTH']=='','floki_changes']+='DOB not in format or empty;'
 
-
+            df.loc[df['LOAD_DT']=='','floki_changes']+='LOAD_DT not in format or empty;'
 
 
 
@@ -1150,7 +1153,7 @@ final_df['PRIMARYID'] = ''
 final_df = final_df[list(headers.values())]
 
     
-final_df.to_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv",index  = False)
+final_df.to_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv",index  = False, quoting=csv.QUOTE_NONE)
 
 # duplicate_hash.to_csv('invalid//duplicates_'+business.loc[i,'File Name'],index  = False)
 
