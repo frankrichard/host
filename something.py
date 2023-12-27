@@ -544,7 +544,7 @@ for i in files_location:
             
             for column in df.columns:
                 
-                # df[column] = df[column].astype(str)
+                df[column] = df[column].astype(str)
                 
                 df[column] = df[column].apply(lambda x: unidecode(str(x)) if pd.notnull(x) else x)
                 
@@ -563,6 +563,9 @@ for i in files_location:
 
 
             #date format
+            
+            df.rename(columns = {'EXPIRYDATE_x':'EXPIRYDATE','LOAD_DT_x':'LOAD_DT'},inplace = True)
+
             
             
             df['ISSUEDATE'] = pd.to_datetime(df['ISSUEDATE'],format = '%m/%d/%Y %I:%M:%S %p',errors = 'coerce')
