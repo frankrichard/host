@@ -1156,6 +1156,7 @@ headers_final.append('HASH_2')
 
 final_df = final_df[headers_final]
 
+final_df.fillna(inplace = True)
     
 final_df.to_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv",index  = False)
 
