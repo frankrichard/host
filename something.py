@@ -842,9 +842,11 @@ for i in files_location:
             df = df.apply(lambda row:hash(row,config['HASH_2_columns'].split(','),'HASH_2'),axis = 1)
             
 
-            total_dataframe  = pd.concat([total_dataframe,df],axis = 0)
+            # total_dataframe  = pd.concat([total_dataframe,df],axis = 0)
             
             print(len(total_dataframe))
+            
+            final_df = df.copy()
 
             
             
@@ -852,6 +854,415 @@ for i in files_location:
                 
             count = count+1
                 
+
+            # final_df = total_dataframe.copy()
+            
+            final_df_duplicates1 = final_df[final_df.duplicated(['HASH_1'])]
+            
+            final_df = final_df[~(final_df.duplicated(['HASH_1']))]
+            
+            final_df_duplicates2 = final_df[final_df.duplicated(['HASH_2'])]
+            
+            final_df = final_df[~(final_df.duplicated(['HASH_2']))]
+            
+            final_df_duplicates = pd.concat([final_df_duplicates1,final_df_duplicates2],axis = 0)                    
+            
+            final_df_duplicates['valid'] = 'invalid'
+                
+            # final_df_duplicates['reason'] +=',' 
+            
+            final_df_duplicates.loc[final_df_duplicates['reason']=='','reason'] = 'duplicates in raw data'
+            
+            final_df_duplicates.loc[final_df_duplicates['reason']!='','reason'] += 'duplicates in raw data'
+            
+            
+            #mis spelling logic
+            print('mis spelling logic')
+            
+            mis_spelled = final_df[final_df.duplicated(keep='first',subset = [config['LastName'],config['CustomerAddress'],config['CustomerDOB']]) | final_df.duplicated(keep='last',subset = [config['LastName'],config['CustomerAddress'],config['CustomerDOB']])]
+            
+            mis_spelled_unique = mis_spelled[~(mis_spelled.duplicated([config['LastName'],config['CustomerAddress'],config['CustomerDOB']]))]
+            
+            final_df = final_df[~(final_df.duplicated(keep='first',subset = [config['LastName'],config['CustomerAddress'],config['CustomerDOB']]) | final_df.duplicated(keep='last',subset = [config['LastName'],config['CustomerAddress'],config['CustomerDOB']]))]
+            
+            mis_spelled_duplicates_final = pd.DataFrame()
+            
+            mis_spelled_unique.reset_index(inplace = True,drop = True)
+            
+            for xy in range(0,len(mis_spelled_unique)):
+                
+                lastname = mis_spelled_unique.loc[xy,config['LastName']]
+            
+                address = mis_spelled_unique.loc[xy,config['CustomerAddress']]
+            
+                dob = mis_spelled_unique.loc[xy,config['CustomerDOB']]
+            
+                temp_df = mis_spelled[((mis_spelled[config['LastName']]==lastname) & (mis_spelled[config['CustomerAddress']]==address) & (mis_spelled[config['CustomerDOB']]==dob))]
+            
+                identical = identify_misspelled_names(list(temp_df[config['FirstName']]))
+                
+                if len(identical)>0:
+                    
+                    set1 = set(list(temp_df[config['FirstName']]))
+                
+                    final_set = list(set1 - set(identical))
+                    
+                    final_set.append(identical[0])
+            
+                    final_df = pd.concat([final_df,mis_spelled[mis_spelled[config['FirstName']].isin(final_set)]],axis= 0)
+            
+                    final_set = identical[1:]
+            
+                    mis_spelled_duplicates = mis_spelled[mis_spelled[config['FirstName']].isin(final_set)]
+                    
+                    mis_spelled_duplicates_final = pd.concat([mis_spelled_duplicates_final,mis_spelled_duplicates],axis = 0)
+                    
+                else:
+                    
+                    final_df = pd.concat([final_df,temp_df],axis = 0)
+            
+                
+            mis_spelled_duplicates_final['valid'] = 'invalid'
+            
+            mis_spelled_duplicates_final['reason'] = 'duplicates by mis-spelling logic'
+            
+            # final_df_duplicates = final_df[final_df.duplicated(['HASH_2'])]
+            
+            # final_df = final_df[~(final_df.duplicated(['HASH_2']))]
+            
+            # final_df_duplicates['valid'] = 'invalid'
+                
+            # # final_df_duplicates['reason'] +=',' 
+            
+            # final_df_duplicates.loc[final_df_duplicates['reason']=='','reason'] = 'duplicates in raw data'
+            
+            # final_df_duplicates.loc[final_df_duplicates['reason']!='','reason'] += 'duplicates in raw data'
+            
+            
+            # cdms = pd.read_csv('CDMS_merged.csv')
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            # hashcode chcek API
+            
+            
+            
+            
+            
+            duplicate_hash_df = pd.DataFrame()
+            
+            duplicate_hash_list = []
+            
+            for xy in range(0,(len(final_df)//500)):
+                
+                hash_codes = final_df['HASH_1'][(xy*500):((xy*500)+500)]
+            
+                body = {"hashCodes":hash_codes}
+            
+                response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
+            
+                duplicate_hashcodes = response.json()     
+                
+                print()
+                    
+                print(response.status_code)
+            
+                
+                # duplicate_hash = final_df[final_df['HASH_1'].isin(duplicate_hashcodes)]
+                
+                duplicate_hash_list.extend(duplicate_hashcodes)
+                
+                # duplicate_hash_df = pd.concat([duplicate_hash_df,duplicate_hash],axis = 0)
+                
+                # valid_output = valid_output[~(valid_output['HASH_1'].isin(duplicate_hashcodes))]
+            
+            
+            
+            hash_codes = final_df[(len(final_df)//500)*500:]
+            
+            body = {"hashCodes":hash_codes}
+            
+            response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
+            
+            duplicate_hashcodes = response.json()        
+            
+            duplicate_hash_list.extend(duplicate_hashcodes)
+            
+            duplicate_hash = final_df[final_df['HASH_1'].isin(duplicate_hashcodes)]
+            
+            final_df = final_df[~(final_df['HASH_1'].isin(duplicate_hashcodes))]
+            
+            duplicate_hash_df = pd.concat([duplicate_hash_df,duplicate_hash],axis = 0)
+            
+            # valid_output = final_df[~(valid_output['HASH_1'].isin(duplicate_hashcodes))]
+            
+            
+            duplicate_hash_list = []
+            
+            
+            for xy in range(0,(len(final_df)//500)):
+                
+                hash_codes = final_df['HASH_2'][(xy*500):((xy*500)+500)]
+            
+                body = {"hashCodes":hash_codes}
+            
+                response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
+            
+                duplicate_hashcodes = response.json()     
+            
+                print()
+                    
+                print(response.status_code)
+                
+                # duplicate_hash = final_df[final_df['HASH_2'].isin(duplicate_hashcodes)]
+            
+                duplicate_hash_list.extend(duplicate_hashcodes)
+            
+                
+                # duplicate_hash_df = pd.concat([duplicate_hash_df,duplicate_hash],axis = 0)
+                
+                # valid_output = valid_output[~(valid_output['HASH_2'].isin(duplicate_hashcodes))]
+                
+                
+            
+            hash_codes = final_df[(len(final_df)//500)*500:]
+            
+            body = {"hashCodes":hash_codes}
+            
+            response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
+            
+            duplicate_hashcodes = response.json()  
+            
+            duplicate_hash_list.extend(duplicate_hashcodes)      
+            
+            duplicate_hash = final_df[final_df['HASH_2'].isin(duplicate_hash_list)]
+            
+            duplicate_hash_df = pd.concat([duplicate_hash_df,duplicate_hash],axis = 0)
+            
+            # valid_output = valid_output[~(valid_output['HASH_2'].isin(duplicate_hashcodes))]
+            
+            final_df = final_df[~(final_df['HASH_2'].isin(duplicate_hash_list))]
+            
+            duplicates = duplicate_hash_df.copy()
+            
+            duplicates['reason'] = 'duplicates identified from system'
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            #completion of API check on hash codes
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            #     # response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/fileUploadExternalApi',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body)
+            
+            
+            # duplicates.to_csv('invalid//duplicates_'+business.loc[i,'File Name'],index  = False)
+            
+            invalid_records = final_df[final_df['valid']=='invalid']
+            
+            final_df = final_df[final_df['valid']=='valid']  
+            
+            
+            if os.path.exists(i.replace(config['replace_string'],config['replace_with'])+"//valid"):
+                
+                pass
+            
+            else:
+                
+                os.makedirs(i.replace(config['replace_string'],config['replace_with'])+"//valid")
+            
+            if os.path.exists(i.replace(config['replace_string'],config['replace_with'])+"//invalid"):
+                
+                pass
+            
+            else:
+                
+                os.makedirs(i.replace(config['replace_string'],config['replace_with'])+"//invalid")
+                
+                
+            if ('Remarks_y' in final_df.columns):
+                
+                pass
+            
+            else:
+                
+                final_df['Remarks_y'] = ''
+            
+            
+            final_df.fillna('',inplace = True)
+            
+            final_df.replace('none','')
+            
+            # final_df['CONTACT_DETAILS'] = final_df[]
+            
+            final_df.rename(columns = {'EXPIRYDATE_x':'EXPIRYDATE','LOAD_DT_x':'LOAD_DT'},inplace = True)
+            
+            final_df['PRIMARYIDTYPE'] = ''
+            
+            final_df['PRIMARYID'] = ''
+            
+            
+            
+            headers_final = list(headers.values())
+            
+            headers_final.append('HASH_1')
+            
+            headers_final.append('HASH_2')
+            
+            
+            final_df.fillna('',inplace = True)
+            
+            
+            
+            
+            final_df.fillna('',inplace = True)
+            
+            final_df = final_df.replace('NONE','')
+                
+            final_df.to_csv(i.replace(config['replace_string'],config['replace_with'])+"//valid//CDMS_output.csv",index  = False)
+            
+            
+            final_df = pd.read_csv(i.replace(config['replace_string'],config['replace_with'])+"//valid//CDMS_output.csv",index  = False)
+            
+            
+            
+            
+            final_df.fillna('',inplace = True)
+            
+            errored_df = final_df[(((final_df['EMAIL']=='') & (final_df['EMAIL_error']!='')) | ((final_df['LANDLINE_NO']=='') & (final_df['LANDLINE_NO_error']!='')) | ((final_df['EXPIRYDATE']=='') & (final_df['EXPIRYDATE_error']!='')) | ((final_df['LOAD_DT']=='') & (final_df['LOAD_DT_error']!='')) |((final_df['DATEOFBIRTH']=='') & (final_df['DATEOFBIRTH_error']!='')))]
+            
+            errored_df.to_csv(i.replace(config['replace_string'],config['replace_with'])+"//invalid//errored_out.csv",index  = False)
+                        
+            final_df = final_df[headers_final]
+            
+            
+            
+            final_df['Remarks_y'] = ''
+            
+            
+            
+            final_df.to_csv(i.replace(config['replace_string'],config['replace_with'])+"//valid//CDMS_output.csv",index  = False)
+            
+            
+            
+            
+            # duplicate_hash.to_csv('invalid//duplicates_'+business.loc[i,'File Name'],index  = False)
+            
+            final_df_duplicates['reason'] = 'duplicates in input'
+            
+            
+            invalid_records = pd.concat([invalid_records,final_df_duplicates],axis = 0)
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            #hashcode API check
+            
+            # invalid_records = pd.concat([invalid_records,duplicates],axis = 0)
+            
+            
+            #hashcode API check
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            invalid_records = pd.concat([invalid_records,mis_spelled_duplicates_final],axis = 0)
+            
+            print(len(invalid_records))
+            
+            invalid_records.to_csv(i.replace(config['replace_string'],config['replace_with'])+"//invalid//CDMS_output.csv",index  = False)
+            
+            corporate_customers.to_csv(i.replace(config['replace_string'],config['replace_with'])+"//valid//corporate_customers.csv",index  = False)
+            
+            
+            print(len(corporate_customers))
+            
+            # print(CDMS_output.columns)
+            
+            body = {
+            
+                "fileName":"CDMS_output.csv",
+            
+                "filePath":i.replace(config['replace_string'],config['replace_with'])+"//valid//",
+            
+                "subListID":76,
+            
+                "userID":149,
+            
+                "businessHierarchyId":23
+            
+            }
+            
+            
+            
+            response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/fileUploadExternalApi',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body)
+            
+            print(response.status_code)
+            
+            upload_id = response.json()['content']['uploadId']
+            
+            
+            try:
+            
+                producer = KafkaProducer(bootstrap_servers='MR402S0352D.palawangroup.com:9092')
+            
+                topic = 'ftpKafkaConsumer'
+             
+                my_dict = {'fileUploadId': upload_id, 'filePath': i.replace(config['replace_string'],config['replace_with'])+"//valid//", 'fileName': 'CDMS_value.csv'}
+                # my_dict = {'fileUploadId': 314, 'filePath': '/STFS0029M/1491702726149369/', 'fileName': 'sampleDoc (98).csv'}
+            
+                my_dict = json.dumps(my_dict)
+            
+                producer.send(topic, value=my_dict.encode('utf-8'))
+            
+                print("Message sent successfully")
+             
+            except Exception as e:
+            
+                print(f"Error: {e}")
+            
+            finally:
+            
+                producer.close()
+
+
+
                 
             with open('response.txt','r') as w:
                 
@@ -885,429 +1296,6 @@ for i in files_location:
 
 
 
-
-
-
-final_df = total_dataframe.copy()
-
-final_df_duplicates1 = final_df[final_df.duplicated(['HASH_1'])]
-
-final_df = final_df[~(final_df.duplicated(['HASH_1']))]
-
-final_df_duplicates2 = final_df[final_df.duplicated(['HASH_2'])]
-
-final_df = final_df[~(final_df.duplicated(['HASH_2']))]
-
-final_df_duplicates = pd.concat([final_df_duplicates1,final_df_duplicates2],axis = 0)                    
-
-final_df_duplicates['valid'] = 'invalid'
-    
-# final_df_duplicates['reason'] +=',' 
-
-final_df_duplicates.loc[final_df_duplicates['reason']=='','reason'] = 'duplicates in raw data'
-
-final_df_duplicates.loc[final_df_duplicates['reason']!='','reason'] += 'duplicates in raw data'
-
-
-#mis spelling logic
-print('mis spelling logic')
-
-mis_spelled = final_df[final_df.duplicated(keep='first',subset = [config['LastName'],config['CustomerAddress'],config['CustomerDOB']]) | final_df.duplicated(keep='last',subset = [config['LastName'],config['CustomerAddress'],config['CustomerDOB']])]
-
-mis_spelled_unique = mis_spelled[~(mis_spelled.duplicated([config['LastName'],config['CustomerAddress'],config['CustomerDOB']]))]
-
-final_df = final_df[~(final_df.duplicated(keep='first',subset = [config['LastName'],config['CustomerAddress'],config['CustomerDOB']]) | final_df.duplicated(keep='last',subset = [config['LastName'],config['CustomerAddress'],config['CustomerDOB']]))]
-
-mis_spelled_duplicates_final = pd.DataFrame()
-
-mis_spelled_unique.reset_index(inplace = True,drop = True)
-
-for xy in range(0,len(mis_spelled_unique)):
-    
-    lastname = mis_spelled_unique.loc[xy,config['LastName']]
-
-    address = mis_spelled_unique.loc[xy,config['CustomerAddress']]
-
-    dob = mis_spelled_unique.loc[xy,config['CustomerDOB']]
-
-    temp_df = mis_spelled[((mis_spelled[config['LastName']]==lastname) & (mis_spelled[config['CustomerAddress']]==address) & (mis_spelled[config['CustomerDOB']]==dob))]
-
-    identical = identify_misspelled_names(list(temp_df[config['FirstName']]))
-    
-    if len(identical)>0:
-        
-        set1 = set(list(temp_df[config['FirstName']]))
-    
-        final_set = list(set1 - set(identical))
-        
-        final_set.append(identical[0])
-
-        final_df = pd.concat([final_df,mis_spelled[mis_spelled[config['FirstName']].isin(final_set)]],axis= 0)
-
-        final_set = identical[1:]
-
-        mis_spelled_duplicates = mis_spelled[mis_spelled[config['FirstName']].isin(final_set)]
-        
-        mis_spelled_duplicates_final = pd.concat([mis_spelled_duplicates_final,mis_spelled_duplicates],axis = 0)
-        
-    else:
-        
-        final_df = pd.concat([final_df,temp_df],axis = 0)
-
-    
-mis_spelled_duplicates_final['valid'] = 'invalid'
-
-mis_spelled_duplicates_final['reason'] = 'duplicates by mis-spelling logic'
-
-# final_df_duplicates = final_df[final_df.duplicated(['HASH_2'])]
-
-# final_df = final_df[~(final_df.duplicated(['HASH_2']))]
-
-# final_df_duplicates['valid'] = 'invalid'
-    
-# # final_df_duplicates['reason'] +=',' 
-
-# final_df_duplicates.loc[final_df_duplicates['reason']=='','reason'] = 'duplicates in raw data'
-
-# final_df_duplicates.loc[final_df_duplicates['reason']!='','reason'] += 'duplicates in raw data'
-
-
-# cdms = pd.read_csv('CDMS_merged.csv')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# hashcode chcek API
-
-
-
-
-
-# duplicate_hash_df = pd.DataFrame()
-
-# duplicate_hash_list = []
-
-# for xy in range(0,(len(final_df)//500)):
-    
-#     hash_codes = final_df['HASH_1'][(xy*500):((xy*500)+500)]
-
-#     body = {"hashCodes":hash_codes}
-
-#     response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
-
-#     duplicate_hashcodes = response.json()     
-    
-#     print()
-        
-#     print(response.status_code)
-
-    
-#     # duplicate_hash = final_df[final_df['HASH_1'].isin(duplicate_hashcodes)]
-    
-#     duplicate_hash_list.append(duplicate_hashcodes)
-    
-#     # duplicate_hash_df = pd.concat([duplicate_hash_df,duplicate_hash],axis = 0)
-    
-#     # valid_output = valid_output[~(valid_output['HASH_1'].isin(duplicate_hashcodes))]
-
-
-
-# hash_codes = final_df[(len(final_df)//500)*500:]
-
-# body = {"hashCodes":hash_codes}
-
-# response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
-
-# duplicate_hashcodes = response.json()        
-
-# duplicate_hash_list.append(duplicate_hashcodes)
-
-# duplicate_hash = final_df[final_df['HASH_1'].isin(duplicate_hashcodes)]
-
-# final_df = final_df[~(final_df['HASH_1'].isin(duplicate_hashcodes))]
-
-# duplicate_hash_df = pd.concat([duplicate_hash_df,duplicate_hash],axis = 0)
-
-# # valid_output = final_df[~(valid_output['HASH_1'].isin(duplicate_hashcodes))]
-
-
-# duplicate_hash_list = []
-
-
-# for xy in range(0,(len(final_df)//500)):
-    
-#     hash_codes = final_df['HASH_2'][(xy*500):((xy*500)+500)]
-
-#     body = {"hashCodes":hash_codes}
-
-#     response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
-
-#     duplicate_hashcodes = response.json()     
-
-#     print()
-        
-#     print(response.status_code)
-    
-#     # duplicate_hash = final_df[final_df['HASH_2'].isin(duplicate_hashcodes)]
-
-#     duplicate_hash_list.append(duplicate_hashcodes)
-
-    
-#     # duplicate_hash_df = pd.concat([duplicate_hash_df,duplicate_hash],axis = 0)
-    
-#     # valid_output = valid_output[~(valid_output['HASH_2'].isin(duplicate_hashcodes))]
-    
-    
-
-# hash_codes = final_df[(len(final_df)//500)*500:]
-
-# body = {"hashCodes":hash_codes}
-
-# response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
-
-# duplicate_hashcodes = response.json()  
-
-# duplicate_hash_list.append(duplicate_hashcodes)      
-
-# duplicate_hash = final_df[final_df['HASH_2'].isin(duplicate_hash_list)]
-
-# duplicate_hash_df = pd.concat([duplicate_hash_df,duplicate_hash],axis = 0)
-
-# # valid_output = valid_output[~(valid_output['HASH_2'].isin(duplicate_hashcodes))]
-
-# final_df = final_df[~(final_df['HASH_2'].isin(duplicate_hash_list))]
-
-# duplicates = duplicate_hash_df.copy()
-
-# duplicates['reason'] = 'duplicates identified from system'
-
-
-
-
-
-
-
-
-
-
-
-#completion of API check on hash codes
-
-
-
-
-
-
-
-
-
-
-
-
-#     # response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/fileUploadExternalApi',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body)
-
-
-# duplicates.to_csv('invalid//duplicates_'+business.loc[i,'File Name'],index  = False)
-
-invalid_records = final_df[final_df['valid']=='invalid']
-
-final_df = final_df[final_df['valid']=='valid']  
-
-
-if os.path.exists(i.replace(config['replace_string'],config['replace_with'])+"//valid"):
-    
-    pass
-
-else:
-    
-    os.makedirs(i.replace(config['replace_string'],config['replace_with'])+"//valid")
-
-if os.path.exists(i.replace(config['replace_string'],config['replace_with'])+"//invalid"):
-    
-    pass
-
-else:
-    
-    os.makedirs(i.replace(config['replace_string'],config['replace_with'])+"//invalid")
-    
-    
-if ('Remarks_y' in final_df.columns):
-    
-    pass
-
-else:
-    
-    final_df['Remarks_y'] = ''
-
-
-final_df.fillna('',inplace = True)
-
-final_df.replace('none','')
-
-# final_df['CONTACT_DETAILS'] = final_df[]
-
-final_df.rename(columns = {'EXPIRYDATE_x':'EXPIRYDATE','LOAD_DT_x':'LOAD_DT'},inplace = True)
-
-final_df['PRIMARYIDTYPE'] = ''
-
-final_df['PRIMARYID'] = ''
-
-
-
-headers_final = list(headers.values())
-
-headers_final.append('HASH_1')
-
-headers_final.append('HASH_2')
-
-
-final_df.fillna('',inplace = True)
-
-
-
-
-final_df.fillna('',inplace = True)
-
-final_df = final_df.replace('NONE','')
-    
-final_df.to_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv",index  = False)
-
-
-final_df = pd.read_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv")
-
-
-
-
-final_df.fillna('',inplace = True)
-
-errored_df = final_df[(((final_df['EMAIL']=='') & (final_df['EMAIL_error']!='')) | ((final_df['LANDLINE_NO']=='') & (final_df['LANDLINE_NO_error']!='')) | ((final_df['EXPIRYDATE']=='') & (final_df['EXPIRYDATE_error']!='')) | ((final_df['LOAD_DT']=='') & (final_df['LOAD_DT_error']!='')) |((final_df['DATEOFBIRTH']=='') & (final_df['DATEOFBIRTH_error']!='')))]
-
-errored_df.to_csv('/STFS0029M/migration_data/overall/valid//errored_out_changes.csv')
-
-
-final_df = final_df[headers_final]
-
-
-
-final_df['Remarks_y'] = ''
-
-
-
-final_df.to_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv",index  = False)
-
-
-
-
-# duplicate_hash.to_csv('invalid//duplicates_'+business.loc[i,'File Name'],index  = False)
-
-final_df_duplicates['reason'] = 'duplicates in input'
-
-
-invalid_records = pd.concat([invalid_records,final_df_duplicates],axis = 0)
-
-
-
-
-
-
-
-
-
-#hashcode API check
-
-# invalid_records = pd.concat([invalid_records,duplicates],axis = 0)
-
-
-#hashcode API check
-
-
-
-
-
-
-
-
-
-
-invalid_records = pd.concat([invalid_records,mis_spelled_duplicates_final],axis = 0)
-
-print(len(invalid_records))
-
-invalid_records.to_csv("/STFS0029M/migration_data/overall/invalid//CDMS_output.csv",index  = False)
-
-corporate_customers.to_csv("/STFS0029M/migration_data/overall/invalid//corporate_customers.csv",index  = False)
-
-
-print(len(corporate_customers))
-
-# print(CDMS_output.columns)
-
-body = {
-
-    "fileName":"CDMS_output.csv",
-
-    "filePath":"/STFS0029M/migration_data/overall/valid/",
-
-    "subListID":76,
-
-    "userID":149,
-
-    "businessHierarchyId":23
-
-}
-
-
-
-response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/fileUploadExternalApi',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body)
-
-print(response.status_code)
-
-upload_id = response.json()['content']['uploadId']
-
-
-try:
-
-    producer = KafkaProducer(bootstrap_servers='MR402S0352D.palawangroup.com:9092')
-
-    topic = 'ftpKafkaConsumer'
- 
-    my_dict = {'fileUploadId': upload_id, 'filePath': "/STFS0029M/migration_data/overall/valid/", 'fileName': 'CDMS_value.csv'}
-    # my_dict = {'fileUploadId': 314, 'filePath': '/STFS0029M/1491702726149369/', 'fileName': 'sampleDoc (98).csv'}
-
-    my_dict = json.dumps(my_dict)
-
-    producer.send(topic, value=my_dict.encode('utf-8'))
-
-    print("Message sent successfully")
- 
-except Exception as e:
-
-    print(f"Error: {e}")
-
-finally:
-
-    producer.close()
 
 
 
