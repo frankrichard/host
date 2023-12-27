@@ -1164,7 +1164,7 @@ errored_df.to_csv('/STFS0029M/migration_data/overall/valid//errored_out_changes.
 
 final_df = final_df[headers_final]
 
-final_df.fillna(inplace = True)
+final_df.fillna('',inplace = True)
 
 final_df = final_df.replace('NONE','')
     
