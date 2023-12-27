@@ -489,7 +489,7 @@ for i in files_location:
             
             df = CDMS_output.copy()
             
-            df['floki changes'] = ''
+            df['floki_changes'] = ''
             
             
             
@@ -567,7 +567,7 @@ for i in files_location:
                 
                 
             
-            df.loc[~(df['EMAIL'].str.contains(email_regex)),'floki changes']= 'invalid Email so replaced as null;'
+            df.loc[~(df['EMAIL'].str.contains(email_regex)),'floki_changes']= 'invalid Email so replaced as null;'
                         
             df['EMAIL']= df[df['EMAIL'].str.contains(email_regex, na=False)]['EMAIL']
             
@@ -578,7 +578,7 @@ for i in files_location:
             df['LANDLINE_NO'] = pd.to_numeric(df['LANDLINE_NO'],errors = 'coerce')
             
             
-            df.loc[df['LANDLINE_NO'].isna(),'floki changes'] += 'invalid landline no;'
+            df.loc[df['LANDLINE_NO'].isna(),'floki_changes'] += 'invalid landline no;'
 
 
             #date format
