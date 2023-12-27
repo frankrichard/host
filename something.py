@@ -1172,7 +1172,7 @@ final_df.to_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv",index
 
 
 
-final_df.read_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv")
+final_df = pd.read_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv")
 
 final_df.fillna(inplace = True)
 
