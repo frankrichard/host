@@ -1147,7 +1147,7 @@ for i in files_location:
             final_df.to_csv(i.replace(config['replace_string'],config['replace_with'])+"//valid//CDMS_output.csv",index  = False)
             
             
-            final_df = pd.read_csv(i.replace(config['replace_string'],config['replace_with'])+"//valid//CDMS_output.csv",index  = False)
+            final_df = pd.read_csv(i.replace(config['replace_string'],config['replace_with'])+"//valid//CDMS_output.csv")
             
             
             
