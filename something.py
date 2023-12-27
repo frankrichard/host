@@ -562,6 +562,12 @@ for i in files_location:
             df.loc[~(df['EMAIL'].str.contains(email_regex)),'floki changes']= 'invalid Email so replaced as null;'
             
             df['EMAIL']= df[df['EMAIL'].str.contains(email_regex, na=False)]['EMAIL']
+            
+            #landline number validation
+            
+            df['LANDLINE_NO'] = pd.to_numeric(df['LANDLINE_NO'],errors = 'coerce')
+            
+            df.loc[df['LANDLINE_NO'].isna(),'floki changes'] += 'invalid landline no;'
 
 
             #date format
@@ -817,11 +823,8 @@ for i in files_location:
             
             print(len(total_dataframe))
 
-
-
-
-
-
+            
+            
 
                 
             count = count+1
@@ -835,6 +838,7 @@ for i in files_location:
                 
                 w.write(text+str(count)+"."+i+"\n")
                                     
+
                 
     except Exception as e:
     
@@ -1154,11 +1158,27 @@ headers_final.append('HASH_1')
 
 headers_final.append('HASH_2')
 
+errored_df = final_df[~final_df['floki changes'].isna()]
+
+errored_df.to_csv('/STFS0029M/migration_data/overall/valid//errored_out_changes.csv')
+
 final_df = final_df[headers_final]
 
 final_df.fillna(inplace = True)
+
+final_df = final_df.replace('NONE','')
     
 final_df.to_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv",index  = False)
+
+
+
+final_df.read_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv")
+
+final_df.fillna(inplace = True)
+
+
+final_df.to_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv",index  = False)
+
 
 # duplicate_hash.to_csv('invalid//duplicates_'+business.loc[i,'File Name'],index  = False)
 
