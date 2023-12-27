@@ -1187,13 +1187,6 @@ final_df.fillna('',inplace = True)
 
 
 
-errored_df = final_df[(((final_df['EMAIL']=='') & (final_df['EMAIL_error']!='')) | ((final_df['LANDLINE_NO']=='') & (final_df['LANDLINE_NO_error']!='')) | ((final_df['EXPIRYDATE']=='') & (final_df['EXPIRYDATE_error']!='')) | ((final_df['LOAD_DT']=='') & (final_df['LOAD_DT_error']!='')) |((final_df['DATEOFBIRTH']=='') & (final_df['DATEOFBIRTH_error']!='')))]
-
-errored_df.to_csv('/STFS0029M/migration_data/overall/valid//errored_out_changes.csv')
-
-
-final_df = final_df[headers_final]
-
 final_df.fillna('',inplace = True)
 
 final_df = final_df.replace('NONE','')
@@ -1201,10 +1194,19 @@ final_df = final_df.replace('NONE','')
 final_df.to_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv",index  = False)
 
 
-
 final_df = pd.read_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv")
 
+
+
+
 final_df.fillna('',inplace = True)
+
+errored_df = final_df[(((final_df['EMAIL']=='') & (final_df['EMAIL_error']!='')) | ((final_df['LANDLINE_NO']=='') & (final_df['LANDLINE_NO_error']!='')) | ((final_df['EXPIRYDATE']=='') & (final_df['EXPIRYDATE_error']!='')) | ((final_df['LOAD_DT']=='') & (final_df['LOAD_DT_error']!='')) |((final_df['DATEOFBIRTH']=='') & (final_df['DATEOFBIRTH_error']!='')))]
+
+errored_df.to_csv('/STFS0029M/migration_data/overall/valid//errored_out_changes.csv')
+
+
+final_df = final_df[headers_final]
 
 
 
