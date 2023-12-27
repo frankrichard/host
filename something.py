@@ -153,15 +153,9 @@ def GYU(row):
         
         splitted_words = row[config['FirstName']].split('#')
         
-
-        
-        try:
-
+        if len(splitted_words)>1:
+    
             splitted_words.pop()        
-            
-        except:
-            
-            pass
         
         splitted_words = splitted_words[0].split(' ')
         
@@ -182,8 +176,10 @@ def GYU(row):
         
         splitted_words = row[config['LastName']].split('#')
 
-        splitted_words.pop()        
-
+        if len(splitted_words)>1:
+    
+            splitted_words.pop()        
+ 
         splitted_words = splitted_words[0].split(' ')
         
         temp_last_name = splitted_words
