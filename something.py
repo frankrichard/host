@@ -495,6 +495,7 @@ for i in files_location:
             
             errored_headers = ['EMAIL','LANDLINE_NO','EXPIRYDATE','LOAD_DT','ISSUEDATE','DATEOFBIRTH']
             
+            
             print('Input file Length')
             
             print(len(df))
@@ -564,6 +565,9 @@ for i in files_location:
 
             #email validation
             
+            for column in ['EMAIL','LANDLINE_NO']:
+                
+                df[column+'_error'] = df[column].copy()
                 
                 
             
@@ -583,8 +587,13 @@ for i in files_location:
 
             #date format
             
-            df.rename(columns = {'EXPIRYDATE_x':'EXPIRYDATE','LOAD_DT_x':'LOAD_DT'},inplace = True)            
-            
+            df.rename(columns = {'EXPIRYDATE_x':'EXPIRYDATE','LOAD_DT_x':'LOAD_DT'},inplace = True)
+                      
+                    
+            for column in ['EXPIRYDATE','LOAD_DT','ISSUEDATE','DATEOFBIRTH']:
+                
+                df[column+'_error'] = df[column].copy()
+
             
             
             df['ISSUEDATE'] = pd.to_datetime(df['ISSUEDATE'],format = '%m/%d/%Y %I:%M:%S %p',errors = 'coerce')
@@ -1176,9 +1185,6 @@ headers_final.append('HASH_2')
 final_df.fillna('',inplace = True)
 
 
-for column in errored_headers:
-    
-    final_df[column+'_error'] = final_df[column]
 
 
 errored_df = final_df[(((final_df['EMAIL']=='') & (final_df['EMAIL_error']!='')) | ((final_df['LANDLINE_NO']=='') & (final_df['LANDLINE_NO_error']!='')) | ((final_df['EXPIRYDATE']=='') & (final_df['EXPIRYDATE_error']!='')) | ((final_df['LOAD_DT']=='') & (final_df['LOAD_DT_error']!='')) |((final_df['DATEOFBIRTH']=='') & (final_df['DATEOFBIRTH_error']!='')))]
