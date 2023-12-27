@@ -487,6 +487,8 @@ for i in files_location:
             
             df = CDMS_output.copy()
             
+            df['floki_changes'] = ''
+            
             print('Input file Length')
             
             print(len(df))
@@ -546,6 +548,8 @@ for i in files_location:
                 
                 df[column] = df[column].apply(lambda x: unidecode(str(x)) if pd.notnull(x) else x)
                 
+                df[column] = df[column].str.replace(',','\,')
+                
 
             
             
@@ -553,12 +557,55 @@ for i in files_location:
             
             #email validation
             
+            df.loc[~(df['EMAIL'].str.contains(email_regex)),'floki changes']= 'invalid Email so replaced as null'
+            
             df['EMAIL']= df[df['EMAIL'].str.contains(email_regex, na=False)]['EMAIL']
 
-                        
+
+            #date format
+            
+            
+            df['ISSUEDATE'] = pd.to_datetime(df['ISSUEDATE'],format = '%m/%d/%Y %I:%M:%S %p',errors = 'coerce')
+
+            df['ISSUEDATE'] = df['ISSUEDATE'].dt.strftime('%m/%d/%Y')
+            
+            df['ISSUEDATE'].fillna('')
+
+            df['EXPIRYDATE'] = pd.to_datetime(df['EXPIRYDATE'],format = '%m/%d/%Y %I:%M:%S %p',errors = 'coerce')
+
+            df['EXPIRYDATE'] = df['EXPIRYDATE'].dt.strftime('%m/%d/%Y')
+            
+            df['EXPIRYDATE'].fillna('')
+
+            df['DATEOFBIRTH'] = pd.to_datetime(df['DATEOFBIRTH'],format = '%m/%d/%Y %I:%M:%S %p',errors = 'coerce')
+
+            df['DATEOFBIRTH'] = df['DATEOFBIRTH'].dt.strftime('%m/%d/%Y')
+            
+            df['DATEOFBIRTH'].fillna('')
+
+            df['LOAD_DT'] = pd.to_datetime(df['LOAD_DT'],format = '%m/%d/%Y %I:%M:%S %p',errors = 'coerce')
+
+            df['LOAD_DT'] = df['LOAD_DT'].dt.strftime('%m/%d/%Y')
+            
+            df['LOAD_DT'].fillna('')
+
+
+
+
+
+
+
+
+
+            # df['ISSUEDATE'] = pd.to_datetime(df['ISSUEDATE'],format = '%m/%d/%Y %I:%M:%S %p')
+
+
 
 
             #adding suffix
+            
+            
+            
             
             suffixes = [ ' I', ' II', ' III', ' IV', ' V', ' JR', ' SR']    
             
@@ -1081,6 +1128,24 @@ else:
     final_df['Remarks_y'] = ''
 
 
+final_df.fillna('',inplace = True)
+
+final_df.replace('none','')
+
+# final_df['CONTACT_DETAILS'] = final_df[]
+
+final_df.rename(columns = {'EXPIRYDATE_x':'EXPIRYDATE','LOAD_DT_x':'LOAD_DT'},inplace = True)
+
+final_df['PRIMARYIDTYPE'] = ''
+
+final_df['PRIMARYID'] = ''
+
+
+
+
+
+final_df = final_df[list(headers.values())]
+
     
 final_df.to_csv("/STFS0029M/migration_data/overall/valid//CDMS_output.csv",index  = False)
 
@@ -1171,4 +1236,8 @@ except Exception as e:
     print(f"Error: {e}")
 
 finally:
+
     producer.close()
+
+
+
