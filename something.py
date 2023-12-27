@@ -566,7 +566,7 @@ for i in files_location:
             
             for column in errored_headers:
                 
-                df[errored_headers[i]+'_error'] = df[errored_headers[i]]
+                df[errored_headers[column]+'_error'] = df[errored_headers[column]]
                 
                 
             
