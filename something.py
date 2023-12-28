@@ -768,7 +768,7 @@ for i in files_location:
         
                 df.loc[df_invalid_phone,'reason'] = 'phone number is invalid'
                 
-                
+                print(df[df['CONTACT_DETAILS']=='0']['valid'].unique())             
         
                 print()    
                 
@@ -842,6 +842,9 @@ for i in files_location:
             df = df.apply(lambda row:hash(row,config['HASH_1_columns'].split(','),'HASH_1'),axis = 1)
             
             df = df.apply(lambda row:hash(row,config['HASH_2_columns'].split(','),'HASH_2'),axis = 1)
+
+            print(df[df['CONTACT_DETAILS']=='0']['valid'].unique())             
+
             
 
             # total_dataframe  = pd.concat([total_dataframe,df],axis = 0)
@@ -870,6 +873,9 @@ for i in files_location:
             final_df_duplicates = pd.concat([final_df_duplicates1,final_df_duplicates2],axis = 0)                    
             
             final_df_duplicates['valid'] = 'invalid'
+
+            print(final_df[final_df['CONTACT_DETAILS']=='0']['valid'].unique())             
+
                 
             # final_df_duplicates['reason'] +=',' 
             
@@ -877,6 +883,7 @@ for i in files_location:
             
             final_df_duplicates.loc[final_df_duplicates['reason']!='','reason'] += 'duplicates in raw data'
             
+            print(final_df[final_df['CONTACT_DETAILS']=='0']['valid'].unique())             
             
             #mis spelling logic
             print('mis spelling logic')
@@ -1089,6 +1096,7 @@ for i in files_location:
             
             final_df = final_df[final_df['valid']=='valid']  
             
+            print(final_df[final_df['CONTACT_DETAILS']=='0']['valid'].unique())             
             
             if os.path.exists(i.replace(config['replace_string'],config['replace_with'])+"//valid"):
                 
@@ -1128,6 +1136,7 @@ for i in files_location:
             
             final_df['PRIMARYID'] = ''
             
+            print(final_df[final_df['CONTACT_DETAILS']=='0']['valid'].unique())             
             
             
             headers_final = list(headers.values())
@@ -1140,6 +1149,7 @@ for i in files_location:
             final_df.fillna('',inplace = True)
             
             
+            print(final_df[final_df['CONTACT_DETAILS']=='0']['valid'].unique())             
             
             
             final_df.fillna('',inplace = True)
@@ -1234,6 +1244,8 @@ for i in files_location:
             
             
             # response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/fileUploadExternalApi',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body)
+            
+            print(hello)
             
             print(response.status_code)
             
