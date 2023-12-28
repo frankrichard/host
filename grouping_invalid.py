@@ -62,7 +62,7 @@ files_location = []
 
 for file in files_in_drive:
     
-    if 'invalid' in file:
+    if (('invalid' in file) & ('overall' not in file)):
     
         file = file.replace('\\','/')
         
@@ -84,6 +84,8 @@ for i in files_location:
     
     df = pd.read_csv(i+'/CDMS_output.csv')
     
+    df = df[['reason','CUSTOMER_ID']]
+    
     split = df['reason'].str.split(',',expand = True)
     
     df['reason'] = split[0]
@@ -92,7 +94,7 @@ for i in files_location:
     
     
     
-    print(df)
+#    print(df)
 
 
 total_df = total_df.groupby(['reason']).count()
