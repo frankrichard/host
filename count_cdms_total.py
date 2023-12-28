@@ -64,6 +64,17 @@ print()
 
 print(files_location)
 
+df = pd.DataFrame(columns = ['Path',config['CDMS_file1'],config['CDMS_file2'],config['CDMS_file3'],config['CDMS_file4'],'overall_input'])
+
+for i in range(0,len(files_location)):
+    
+    df.loc[i,'Path'] = files_location[i]
+
+df = df.drop_duplicates(['Path'])
+
+df.index = df['Path']
+
+
 
 for i in files_location:
     
@@ -72,3 +83,45 @@ for i in files_location:
         
         
         print(i)
+
+        file1 = pd.read_csv(i+"//"+config['CDMS_file1'],encoding='ISO-8859-1', sep="|")
+        
+        file2 = pd.read_csv(i+'//'+config['CDMS_file2'],encoding='ISO-8859-1', sep="|")
+        
+        file3 = pd.read_csv(i+"//"+config['CDMS_file3'],encoding='ISO-8859-1', sep="|")
+        
+        file4 = pd.read_csv(i+'//'+config['CDMS_file4'],encoding='ISO-8859-1', sep="|")
+    
+        headers = pd.read_csv('headers_matching.csv')
+        
+        headers = dict(list(zip(headers['key'],headers['value'])))
+        
+        file1.rename(columns = headers,inplace = True)
+        
+        file2.rename(columns = headers,inplace = True)
+        
+        file3.rename(columns = headers,inplace = True)
+        
+        file4.rename(columns = headers,inplace = True)
+            
+        
+        
+        #Merging all the files
+        
+        CDMS_merged = pd.merge(file1,file2,how = 'left',on = [config['customer_id']])
+        
+        CDMS_merged = pd.merge(CDMS_merged,file3,how = 'left',on = [config['customer_id']])
+        
+        CDMS_merged = pd.merge(CDMS_merged,file4,how = 'left',on = [config['customer_id']])
+
+        df.loc[i,config['file1']] = len(file1)
+        
+        df.loc[i,config['file2']] = len(file2)
+
+        df.loc[i,config['file3']] = len(file3)
+
+        df.loc[i,config['file4']] = len(file4)
+
+        df.loc[i,'overall_input'] = len(CDMS_merged)       
+
+df.to_csv('input_count.csv')
