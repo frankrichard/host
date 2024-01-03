@@ -42,7 +42,6 @@ def hash(row,column,hash_value):
 
     columnName = 'hash_'
 
-
     # hashColumn = pd.Series()
     
     # for i in range((len(sourcedf[column[0]]))):
@@ -90,59 +89,119 @@ def identify_misspelled_names(names):
 
 def special_character_check_firstname(row):
 
-    special_char = re.compile(r'[^a-zA-Z0-9]')
+    first_name = row['FIRSTNAME']
+    
+    last_name = row['LASTNAME']
 
-    if special_char.search(row[config['FirstName']]) != None:
-        
-        if len(row[config['LastName']].split(' '))>1:
-            
-            temp_last_name = row[config['LastName']].split(' ')
-            
-            row[config['FirstName']] = ' '.join(temp_last_name[0:len(temp_last_name)-1])
-            
-            row[config['LastName']] = temp_last_name[len(temp_last_name)-1]
-        
-        else:
-            
-            row['valid'] = 'invalid'
+    while(True):
 
-            if row['reason']=='':
+        special_char = re.compile(r'[^a-zA-Z0-9]')
+    
+        if special_char.search(row[config['FirstName']].replace(' ','').replace('-','')) != None:
             
-                row['reason'] = 'special characters in First name'
+            if len(row[config['LastName']].split(' '))>1:
                 
+                temp_last_name = row[config['LastName']].split(' ')
+                
+                row[config['FirstName']] = ' '.join(temp_last_name[0:len(temp_last_name)-1])
+                
+                row[config['LastName']] = temp_last_name[len(temp_last_name)-1]
+            
             else:
                 
-                row['reason'] += ',Special characters in first name'
+                row['valid'] = 'invalid'
+    
+                if row['reason']=='':
+                
+                    row['reason'] = 'special characters in First name'
+                    
+                else:
+                    
+                    row['reason'] += ',Special characters in first name'
+
+
+        if ((row['FIRSTNAME']==first_name) & (row['LASTNAME']==last_name)):
+            
+            break
+        
+        else:
+
+            first_name = row['FIRSTNAME']
+            
+            last_name = row['LASTNAME']                
+            
+            pass
+
+
+        row = single_character_check_firstname(row)
+
+        row = single_character_check_lastname(row)
+
+        row = number_check_firstname(row)
+
+        row = number_check_lastname(row)
+                
             
             
     return row
 
 def special_character_check_lastname(row):
-
-    special_char = re.compile(r'[^a-zA-Z0-9]')
     
-    if special_char.search(row[config['LastName']]) != None:
+    first_name = row['FIRSTNAME']
+    
+    last_name = row['LASTNAME']
+
+    while(True):
+
+
+        special_char = re.compile(r'[^a-zA-Z0-9]')
         
-        if len(row[config['FirstName']].split(' '))>1:
+        if special_char.search(row[config['FirstName']].replace(' ','').replace('-','')) != None:
             
-            temp_last_name = row[config['FirstName']].split(' ')
-            
-            row[config['FirstName']] = ' '.join(temp_last_name[0:len(temp_last_name)-1])
-            
-            row[config['LastName']] = temp_last_name[len(temp_last_name)-1]
-        
-        else:
-            
-            row['valid'] = 'invalid'
-            
-            
-            if row['reason']=='':
-            
-                row['reason'] = 'Special characters in last name'
+            if len(row[config['FirstName']].split(' '))>1:
                 
+                temp_last_name = row[config['FirstName']].split(' ')
+                
+                row[config['FirstName']] = ' '.join(temp_last_name[0:len(temp_last_name)-1])
+                
+                row[config['LastName']] = temp_last_name[len(temp_last_name)-1]
+            
             else:
                 
-                row['reason'] += ',Special characters in last name'
+                row['valid'] = 'invalid'
+                
+                
+                if row['reason']=='':
+                
+                    row['reason'] = 'Special characters in last name'
+                    
+                else:
+                    
+                    row['reason'] += ',Special characters in last name'
+                    
+
+        if ((row['FIRSTNAME']==first_name) & (row['LASTNAME']==last_name)):
+            
+            break
+        
+        else:
+
+            first_name = row['FIRSTNAME']
+            
+            last_name = row['LASTNAME']                
+            
+            pass
+
+
+        row = single_character_check_firstname(row)
+
+        row = single_character_check_lastname(row)
+
+        row = number_check_firstname(row)
+
+        row = number_check_lastname(row)
+                
+        row = special_character_check_firstname(row)
 
     return row
 
@@ -199,31 +258,55 @@ def GYU(row):
 
 def number_check_firstname(row):
     
-    if len(re.findall(r'[0-9]+', row[config['FirstName']]))>0:
-        
-        
-        if len(row[config['LastName']].split(' '))>1:
-            
-            
-            temp_last_name = row[config['LastName']].split(' ')
-            
-            row[config['FirstName']] = ' '.join(temp_last_name[0:len(temp_last_name)-1])
-            
-            row[config['LastName']] = temp_last_name[len(temp_last_name)-1]
-        
-        else:
-            
-            
-            row['valid'] = 'invalid'
+    first_name = row['FIRSTNAME']
+    
+    last_name = row['LASTNAME']
 
-            if row['reason']=='':
+    while(True):
+
+    
+        if len(re.findall(r'[0-9]+', row[config['FirstName']]))>0:
             
-                row['reason'] = 'Numeric characters in First name'
+            
+            if len(row[config['LastName']].split(' '))>1:
                 
+                
+                temp_last_name = row[config['LastName']].split(' ')
+                
+                row[config['FirstName']] = ' '.join(temp_last_name[0:len(temp_last_name)-1])
+                
+                row[config['LastName']] = temp_last_name[len(temp_last_name)-1]
+            
             else:
                 
-                row['reason'] += ',Numeric characters in first name'
+                
+                row['valid'] = 'invalid'
+    
+                if row['reason']=='':
+                
+                    row['reason'] = 'Numeric characters in First name'
+                    
+                else:
+                    
+                    row['reason'] += ',Numeric characters in first name'
             
+
+        if ((row['FIRSTNAME']==first_name) & (row['LASTNAME']==last_name)):
+            
+            break
+        
+        else:
+
+            first_name = row['FIRSTNAME']
+            
+            last_name = row['LASTNAME']                
+            
+            pass
+
+
+        row = single_character_check_firstname(row)
+
+        row = single_character_check_lastname(row)
             
     return row
 
@@ -231,29 +314,55 @@ def number_check_firstname(row):
 
 
 def number_check_lastname(row):
+
+    first_name = row['FIRSTNAME']
     
-    if len(re.findall(r'[0-9]+', row[config['LastName']]))>0:
-        
-        if len(row[config['FirstName']].split(' '))>1:
+    last_name = row['LASTNAME']
+
+    while(True):
+    
+        if len(re.findall(r'[0-9]+', row[config['LastName']]))>0:
             
-            temp_last_name = row[config['FirstName']].split(' ')
+            if len(row[config['FirstName']].split(' '))>1:
+                
+                temp_last_name = row[config['FirstName']].split(' ')
+                
+                row[config['FirstName']] = ' '.join(temp_last_name[0:len(temp_last_name)-1])
+                
+                row[config['LastName']] = temp_last_name[len(temp_last_name)-1]
             
-            row[config['FirstName']] = ' '.join(temp_last_name[0:len(temp_last_name)-1])
+            else:
+                
+                row['valid'] = 'invalid'
+                
+                
+                if row['reason']=='':
+                
+                    row['reason'] = 'Numeric characters in last name'
+                    
+                else:
+                    
+                    row['reason'] += ',Numeric characters in last name'
+
+
+        if ((row['FIRSTNAME']==first_name) & (row['LASTNAME']==last_name)):
             
-            row[config['LastName']] = temp_last_name[len(temp_last_name)-1]
+            break
         
         else:
             
-            row['valid'] = 'invalid'
+            first_name = row['FIRSTNAME']
             
+            last_name = row['LASTNAME']                
             
-            if row['reason']=='':
-            
-                row['reason'] = 'Numeric characters in last name'
-                
-            else:
-                
-                row['reason'] += ',Numeric characters in last name'
+            pass
+
+
+        row = single_character_check_firstname(row)
+
+        row = single_character_check_lastname(row)
+
+        row = number_check_firstname(row)
 
     return row
 
@@ -270,6 +379,8 @@ def single_character_check_firstname(row):
             row[config['FirstName']] = ' '.join(temp_last_name[0:len(temp_last_name)-1])
             
             row[config['LastName']] = temp_last_name[len(temp_last_name)-1]
+            
+
         
         else:
             
@@ -288,40 +399,65 @@ def single_character_check_firstname(row):
     
 def single_character_check_lastname(row):
     
-    if len(row[config['LastName']])<2:
-        
-        if len(row[config['FirstName']].split(' '))>1:
+
+    first_name = row['FIRSTNAME']
+    
+    last_name = row['LASTNAME']
+
+    while(True):
+    
+        if len(row[config['LastName']])<2:
             
-            temp_last_name = row[config['FirstName']].split(' ')
-            
-            row[config['FirstName']] = ' '.join(temp_last_name[0:len(temp_last_name)-1])
-            
-            row[config['LastName']] = temp_last_name[len(temp_last_name)-1]
-        
-        else:
-            
-            row['valid'] = 'invalid'
-            
-            if row[config['LastName']]=='':
+            if len(row[config['FirstName']].split(' '))>1:
                 
-            
-                if row['reason']=='':
+                temp_last_name = row[config['FirstName']].split(' ')
                 
-                    row['reason'] = 'Null value in last name'
-                    
-                else:
-                    
-                    row['reason'] += ',Null value in last name'
+                row[config['FirstName']] = ' '.join(temp_last_name[0:len(temp_last_name)-1])
+                
+                row[config['LastName']] = temp_last_name[len(temp_last_name)-1]
+                
             
             else:
                 
-                if row['reason']=='':
+                row['valid'] = 'invalid'
                 
-                    row['reason'] = 'Single character in last name'
+                if row[config['LastName']]=='':
                     
+                
+                    if row['reason']=='':
+                    
+                        row['reason'] = 'Null value in last name'
+                        
+                    else:
+                        
+                        row['reason'] += ',Null value in last name'
+                
                 else:
                     
-                    row['reason'] += ',Single character in last name'
+                    if row['reason']=='':
+                    
+                        row['reason'] = 'Single character in last name'
+                        
+                    else:
+                        
+                        row['reason'] += ',Single character in last name'
+    
+
+        
+            row = single_character_check_firstname(row)
+        
+        if ((row['FIRSTNAME']==first_name) & (row['LASTNAME']==last_name)):
+            
+            break
+        
+        else:
+            
+            first_name = row['FIRSTNAME']
+            
+            last_name = row['LASTNAME']                
+
+            pass
+
 
     return row
     
@@ -397,6 +533,12 @@ mapping_config.reset_index(inplace = True,drop = True)
 mapping_config.fillna('',inplace = True)
 
 
+mapping = pd.read_excel('column_mapping.xlsx')
+
+mapping.fillna('',inplace = True)
+
+mapping = mapping.to_dict(orient = 'records')
+
 for i in files_location:
     
     csv_files = os.listdir(i)
@@ -409,6 +551,18 @@ for i in files_location:
                             
                 print(i)
                 
+                for row in range(len(mapping.keys())):
+                    
+                    if mapping[row]['Actual CSV Files']==transaction_file:
+                        
+                        mapping1 = {
+      
+                            value: key for key, value in mapping.items()  if value!=''
+
+                        }
+                        
+                print(mapping1)
+                
                 
                 
                 file1 = pd.read_csv(i+"//"+transaction_file,encoding='ISO-8859-1', sep="|")
@@ -416,8 +570,6 @@ for i in files_location:
                 current_config = mapping_config[mapping_config['File Name']==transaction_file]
                 
                 current_config.reset_index(inplace = True,drop = True)
-                
-                
                 
                 columns = []
                 
@@ -435,9 +587,13 @@ for i in files_location:
             
                 file1.rename(columns = {current_config.loc[0,'DOB'].upper():config['CustomerDOB']},inplace = True)    
                 
-                renaming_columns = eval(current_config.loc[0,'headers'])
+                file1.rename(mapping1,inplace = True)
                 
-                file1.rename(columns = renaming_columns,inplace = True)
+                
+                
+                # renaming_columns = eval(current_config.loc[0,'headers'])
+                
+                # file1.rename(columns = renaming_columns,inplace = True)
                 
                 missing_columns = set([config['FirstName'],config['LastName'],config['CustomerAddress'],config['CustomerDOB']]) - set(file1.columns) 
                 
@@ -448,11 +604,18 @@ for i in files_location:
                     print('columns missing in file '+current_config.loc[0,'File Name']+" : "+','.join(missing_columns))
                     
                     continue
+                
+                
             
                 df = file1.copy()                
                 
+                df[config['ADDRESS2']] = ''
+
+                df[config['ADDRESS3']] = ''
+
+                df[config['ADDRESS4']] = ''
                 
-                
+                df[config['CustomerAddress']] = df[config['ADDRESS1']] 
                 
                 df['floki_changes'] = ''
                 
@@ -524,74 +687,82 @@ for i in files_location:
     
                 #email validation
                 
-                # for column in ['EMAIL','LANDLINE_NO']:
+                for column in ['EMAIL','LANDLINE_NO']:
                     
-                #     df[column+'_error'] = df[column].copy()
+                    if column not in df.columns:
+                        
+                        df[columns] = ''
+                    
+                    df[column+'_error'] = df[column].copy()
                     
                     
                 
-                # df.loc[~(df['EMAIL'].str.contains(email_regex)),'floki_changes']= 'invalid Email so replaced as null;'
+                df.loc[~(df['EMAIL'].str.contains(email_regex)),'floki_changes']= 'invalid Email so replaced as null;'
                             
-                # df['EMAIL']= df[df['EMAIL'].str.contains(email_regex, na=False)]['EMAIL']
+                df['EMAIL']= df[df['EMAIL'].str.contains(email_regex, na=False)]['EMAIL']
                 
                 #landline number validation
                 
-                # df['LANDLINE_CHECK'] = df['LANDLINE_NO']
+                df['LANDLINE_CHECK'] = df['LANDLINE_NO']
                 
-                # df['LANDLINE_NO'] = pd.to_numeric(df['LANDLINE_NO'],errors = 'coerce')
+                df['LANDLINE_NO'] = pd.to_numeric(df['LANDLINE_NO'],errors = 'coerce')
                 
                 
-                # df.loc[df['LANDLINE_NO'].isna(),'floki_changes'] += 'invalid landline no;'
+                df.loc[df['LANDLINE_NO'].isna(),'floki_changes'] += 'invalid landline no;'
     
     
                 #date format
                 
-                # df.rename(columns = {'EXPIRYDATE_x':'EXPIRYDATE','LOAD_DT_x':'LOAD_DT'},inplace = True)
+                df.rename(columns = {'EXPIRYDATE_x':'EXPIRYDATE','LOAD_DT_x':'LOAD_DT'},inplace = True)
                           
                         
-                # for column in ['EXPIRYDATE','LOAD_DT','ISSUEDATE','DATEOFBIRTH']:
+                for column in ['EXPIRYDATE','LOAD_DT','ISSUEDATE','DATEOFBIRTH']:
                     
-                #     df[column+'_error'] = df[column].copy()
+                    if column not in df.columns:
+                        
+                        df[columns] = ''
+
+                    df[column+'_error'] = df[column].copy()
     
                 
                 
-                # df['ISSUEDATE'] = pd.to_datetime(df['ISSUEDATE'],format = '%m/%d/%Y %I:%M:%S %p',errors = 'coerce')
+                df['ISSUEDATE'] = pd.to_datetime(df['ISSUEDATE'],format = '%m/%d/%Y %I:%M:%S %p',errors = 'coerce')
     
-                # df['ISSUEDATE'] = df['ISSUEDATE'].dt.strftime('%m/%d/%Y')
+                df['ISSUEDATE'] = df['ISSUEDATE'].dt.strftime('%m/%d/%Y')
                 
-                # df['ISSUEDATE'].fillna('',inplace = True)
+                df['ISSUEDATE'].fillna('',inplace = True)
     
-                # df['EXPIRYDATE'] = pd.to_datetime(df['EXPIRYDATE'],format = '%m/%d/%Y %I:%M:%S %p',errors = 'coerce')
+                df['EXPIRYDATE'] = pd.to_datetime(df['EXPIRYDATE'],format = '%m/%d/%Y %I:%M:%S %p',errors = 'coerce')
     
-                # df['EXPIRYDATE'] = df['EXPIRYDATE'].dt.strftime('%m/%d/%Y')
+                df['EXPIRYDATE'] = df['EXPIRYDATE'].dt.strftime('%m/%d/%Y')
                 
-                # df['EXPIRYDATE'].fillna('',inplace = True)
+                df['EXPIRYDATE'].fillna('',inplace = True)
     
-                # df['DATEOFBIRTH'] = pd.to_datetime(df['DATEOFBIRTH'],format = '%m/%d/%Y %I:%M:%S %p',errors = 'coerce')
+                df['DATEOFBIRTH'] = pd.to_datetime(df['DATEOFBIRTH'],format = '%m/%d/%Y %I:%M:%S %p',errors = 'coerce')
     
-                # df['DATEOFBIRTH'] = df['DATEOFBIRTH'].dt.strftime('%m/%d/%Y')
+                df['DATEOFBIRTH'] = df['DATEOFBIRTH'].dt.strftime('%m/%d/%Y')
                 
-                # df['DATEOFBIRTH'].fillna('',inplace = True)
+                df['DATEOFBIRTH'].fillna('',inplace = True)
     
-                # df['LOAD_DT'] = pd.to_datetime(df['LOAD_DT'],format = '%m/%d/%Y %I:%M:%S %p',errors = 'coerce')
+                df['LOAD_DT'] = pd.to_datetime(df['LOAD_DT'],format = '%m/%d/%Y %I:%M:%S %p',errors = 'coerce')
     
-                # df['LOAD_DT'] = df['LOAD_DT'].dt.strftime('%m/%d/%Y')
+                df['LOAD_DT'] = df['LOAD_DT'].dt.strftime('%m/%d/%Y')
                 
-                # df['LOAD_DT'].fillna('',inplace = True)
+                df['LOAD_DT'].fillna('',inplace = True)
     
-                # df.loc[df['ISSUEDATE']=='','floki_changes']+='issuedate not in format or empty;'
+                df.loc[df['ISSUEDATE']=='','floki_changes']+='issuedate not in format or empty;'
     
-                # df.loc[df['EXPIRYDATE']=='','floki_changes']+='expiry date not in format or empty;'
+                df.loc[df['EXPIRYDATE']=='','floki_changes']+='expiry date not in format or empty;'
     
-                # df.loc[df['DATEOFBIRTH']=='','floki_changes']+='DOB not in format or empty;'
+                df.loc[df['DATEOFBIRTH']=='','floki_changes']+='DOB not in format or empty;'
     
-                # df.loc[df['LOAD_DT']=='','floki_changes']+='LOAD_DT not in format or empty;'
+                df.loc[df['LOAD_DT']=='','floki_changes']+='LOAD_DT not in format or empty;'
     
                             
     
     
     
-                # df['ISSUEDATE'] = pd.to_datetime(df['ISSUEDATE'],format = '%m/%d/%Y %I:%M:%S %p')
+                df['ISSUEDATE'] = pd.to_datetime(df['ISSUEDATE'],format = '%m/%d/%Y %I:%M:%S %p')
     
     
     
@@ -647,21 +818,21 @@ for i in files_location:
                 
                 #using branch codes
                 
-                # branch_codes = pd.read_excel('branch_code.xlsx',engine = 'openpyxl')
+                branch_codes = pd.read_excel('branch_code.xlsx',engine = 'openpyxl')
                 
-                # branch_codes1 = dict(list(zip(branch_codes['PEPP Code'],branch_codes['Partner Name'])))
+                branch_codes1 = dict(list(zip(branch_codes['PEPP Code'],branch_codes['Partner Name'])))
                 
-                # df['some'] = ''
+                df['some'] = ''
         
-                # df.loc[((df['CORPORATE']=='False') & (df['BRANCHCODE'].isin(branch_codes['PEPP Code']))),'CORPORATE'] = True
+                df.loc[((df['CORPORATE']=='False') & (df['BRANCHCODE'].isin(branch_codes['PEPP Code']))),'CORPORATE'] = True
                 
-                # df.loc[((df['CORPORATE']=='False') & (df['BRANCHCODE'].isin(branch_codes['PEPP Code']))),'some'] = df.loc[((df['CORPORATE']=='False') & (df['BRANCHCODE'].isin(branch_codes['PEPP Code']))),'BRANCHCODE']
+                df.loc[((df['CORPORATE']=='False') & (df['BRANCHCODE'].isin(branch_codes['PEPP Code']))),'some'] = df.loc[((df['CORPORATE']=='False') & (df['BRANCHCODE'].isin(branch_codes['PEPP Code']))),'BRANCHCODE']
                 
-                # df['some'] = df['some'].replace(branch_codes1)
+                df['some'] = df['some'].replace(branch_codes1)
                 
-                # df.loc[((df['CORPORATE']=='False') & (df['BRANCHCODE'].isin(branch_codes['PEPP Code']))),config['LastName']] = df.loc[((df['CORPORATE']=='False') & (df['BRANCHCODE'].isin(branch_codes['PEPP Code']))),'some']
+                df.loc[((df['CORPORATE']=='False') & (df['BRANCHCODE'].isin(branch_codes['PEPP Code']))),config['LastName']] = df.loc[((df['CORPORATE']=='False') & (df['BRANCHCODE'].isin(branch_codes['PEPP Code']))),'some']
                 
-                # df.drop(columns = ['some'],inplace = True)
+                df.drop(columns = ['some'],inplace = True)
                 
                 corporate_customers = df[df['CORPORATE'] == True]
                 
@@ -672,83 +843,56 @@ for i in files_location:
                 
                 
                 
-                # df['count'] = df[config['FirstName']].str.len()
                 
-                # df_temp = df[df['count']<2]
+                print()
                 
-                # df = df[df['count']>=2]
-                
-                # temp_split = df_temp[config['LastName']].str.split(' ')
-                
-                # df_temp = pd.concat([df_temp,temp_split],axis = 1)
-                
-                valid_count = 0
-                
-                invalid_count = 0
+                print('single character check')
                 
                 
-                while(True):
+                df = df.apply(lambda row:single_character_check_firstname(row),axis = 1)
                 
+                df = df.apply(lambda row:single_character_check_lastname(row),axis = 1)
                 
+                print()
                 
-                    print()
-                    
-                    print('single character check')
-                    
-                    
-                    df = df.apply(lambda row:single_character_check_firstname(row),axis = 1)
-                    
-                    df = df.apply(lambda row:single_character_check_lastname(row),axis = 1)
-                    
-                    print()
-                    
-                    print('numeric character check')
-                    
-                    df = df.apply(lambda row:number_check_firstname(row),axis = 1)
-                    
-                    df = df.apply(lambda row:number_check_lastname(row),axis = 1)
-                    
-            
-                    print('contact details check')
-                    
-                    df['length'] = df['CONTACT_DETAILS'].str.len()
-                    
-                    # df.loc[(df['length']==10) & (df['CONTACT_DETAILS'])]
-                    
-                    df_valid = ((df['CONTACT_DETAILS'].str.len()==10) & (df['CONTACT_DETAILS'].str.startswith('9')) | ((df['CONTACT_DETAILS'].str.len()==11) & (df['CONTACT_DETAILS'].str.startswith('0'))) | ((df['CONTACT_DETAILS'].str.len()==12) & (df['CONTACT_DETAILS'].str.startswith('6'))))
-                    
-                    df_invalid_phone = ~((df['CONTACT_DETAILS'].str.len()==10) & (df['CONTACT_DETAILS'].str.startswith('9')) | ((df['CONTACT_DETAILS'].str.len()==11) & (df['CONTACT_DETAILS'].str.startswith('0'))) | ((df['CONTACT_DETAILS'].str.len()==12) & (df['CONTACT_DETAILS'].str.startswith('6'))))
-                    
-                    # df.loc[df_valid,'valid'] = 'valid'
-                    
-                    df.loc[df_invalid_phone,'valid'] = 'invalid'
-            
-                    df.loc[df_invalid_phone,'reason'] = 'phone number is invalid'
-                    
-                    
-            
-                    print()    
-                    
-                    
-                    
-                    print('special character check')
-                    
-                    
-                    
-                    df = df.apply(lambda row:special_character_check_firstname(row),axis = 1)
-                    
-                    df = df.apply(lambda row:special_character_check_lastname(row),axis = 1)
-                    
-                    if ((valid_count == df['valid'].value_counts()['valid']) and (invalid_count == df['valid'].value_counts()['invalid'])):
-                        
-                        break
+                print('numeric character check')
+                
+                df = df.apply(lambda row:number_check_firstname(row),axis = 1)
+                
+                df = df.apply(lambda row:number_check_lastname(row),axis = 1)
+                
         
-                    else:
-                        
-                        valid_count = df['valid'].value_counts()['valid']
-                        
-                        invalid_count = df['valid'].value_counts()['invalid']
-                    
+                print('contact details check')
+                
+                df['length'] = df['CONTACT_DETAILS'].str.len()
+                
+                # df.loc[(df['length']==10) & (df['CONTACT_DETAILS'])]
+                
+                df_valid = ((df['CONTACT_DETAILS'].str.len()==10) & (df['CONTACT_DETAILS'].str.startswith('9')) | ((df['CONTACT_DETAILS'].str.len()==11) & (df['CONTACT_DETAILS'].str.startswith('0'))) | ((df['CONTACT_DETAILS'].str.len()==12) & (df['CONTACT_DETAILS'].str.startswith('6'))))
+                
+                df_invalid_phone = ~((df['CONTACT_DETAILS'].str.len()==10) & (df['CONTACT_DETAILS'].str.startswith('9')) | ((df['CONTACT_DETAILS'].str.len()==11) & (df['CONTACT_DETAILS'].str.startswith('0'))) | ((df['CONTACT_DETAILS'].str.len()==12) & (df['CONTACT_DETAILS'].str.startswith('6'))))
+                
+                # df.loc[df_valid,'valid'] = 'valid'
+                
+                df.loc[df_invalid_phone,'valid'] = 'invalid'
+        
+                df.loc[df_invalid_phone,'reason'] = 'phone number is invalid'
+                
+                
+        
+                print()    
+                
+                
+                
+                print('special character check')
+                
+                
+                
+                df = df.apply(lambda row:special_character_check_firstname(row),axis = 1)
+                
+                df = df.apply(lambda row:special_character_check_lastname(row),axis = 1)
+                
+                
                 
                 
                 if 'CustomerBirthDate' in df.columns:
@@ -874,28 +1018,6 @@ for i in files_location:
                 
                 mis_spelled_duplicates_final['reason'] = 'duplicates by mis-spelling logic'
                 
-                # final_df_duplicates = final_df[final_df.duplicated(['HASH_2'])]
-                
-                # final_df = final_df[~(final_df.duplicated(['HASH_2']))]
-                
-                # final_df_duplicates['valid'] = 'invalid'
-                    
-                # # final_df_duplicates['reason'] +=',' 
-                
-                # final_df_duplicates.loc[final_df_duplicates['reason']=='','reason'] = 'duplicates in raw data'
-                
-                # final_df_duplicates.loc[final_df_duplicates['reason']!='','reason'] += 'duplicates in raw data'
-                
-                
-                # cdms = pd.read_csv('CDMS_merged.csv')
-                
-                
-                
-                
-                
-                
-                
-                
                 
                 
                 
@@ -919,18 +1041,8 @@ for i in files_location:
                 
                     duplicate_hashcodes = response.json()     
                     
-                    print()
-                        
-                    print(response.status_code)
-                
-                    
-                    # duplicate_hash = final_df[final_df['HASH_1'].isin(duplicate_hashcodes)]
-                    
                     duplicate_hash_list.extend(duplicate_hashcodes)
                     
-                    # duplicate_hash_df = pd.concat([duplicate_hash_df,duplicate_hash],axis = 0)
-                    
-                    # valid_output = valid_output[~(valid_output['HASH_1'].isin(duplicate_hashcodes))]
                 
                 
                 
@@ -944,9 +1056,9 @@ for i in files_location:
                 
                 duplicate_hash_list.extend(duplicate_hashcodes)
                 
-                duplicate_hash = final_df[final_df['HASH_1'].isin(duplicate_hashcodes)]
+                duplicate_hash = final_df[final_df['HASH_1'].isin(duplicate_hash_list)]
                 
-                final_df = final_df[~(final_df['HASH_1'].isin(duplicate_hashcodes))]
+                final_df = final_df[~(final_df['HASH_1'].isin(duplicate_hash_list))]
                 
                 duplicate_hash_df = pd.concat([duplicate_hash_df,duplicate_hash],axis = 0)
                 
@@ -1088,8 +1200,12 @@ for i in files_location:
                 final_df.fillna('',inplace = True)
                 
                 final_df = final_df.replace('NONE','')
+                
+                final_df['ID'] = ''
+                
+                final_df['BIZ_ID'] = ''
                     
-                final_df.to_csv(i.replace(config['replace_string'],config['replace_with'])+"//valid//CDMS_output.csv",index  = False)
+                final_df.to_csv(i.replace(config['replace_string'],config['replace_with'])+"//valid//"+transaction_file+"_CDMS_output.csv",index  = False)
                 
                 
                 final_df = pd.read_csv(i.replace(config['replace_string'],config['replace_with'])+"//valid//CDMS_output.csv")
@@ -1111,7 +1227,7 @@ for i in files_location:
                 
                 
                 
-                final_df.to_csv(i.replace(config['replace_string'],config['replace_with'])+"//valid//CDMS_output.csv",index  = False)
+                final_df.to_csv(i.replace(config['replace_string'],config['replace_with'])+"//valid//"+transaction_file+"_CDMS_output.csv",index  = False)
                 
                 
                 
@@ -1151,9 +1267,9 @@ for i in files_location:
                 
                 print(len(invalid_records))
                 
-                invalid_records.to_csv(i.replace(config['replace_string'],config['replace_with'])+"//invalid//CDMS_output.csv",index  = False)
+                invalid_records.to_csv(i.replace(config['replace_string'],config['replace_with'])+"//invalid//"+transaction_file+"_CDMS_output.csv",index  = False)
                 
-                corporate_customers.to_csv(i.replace(config['replace_string'],config['replace_with'])+"//valid//corporate_customers.csv",index  = False)
+                corporate_customers.to_csv(i.replace(config['replace_string'],config['replace_with'])+"//valid//"+transaction_file+"_corporate_customers.csv",index  = False)
                 
                 
                 print(len(corporate_customers))
