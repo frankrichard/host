@@ -902,9 +902,11 @@ for i in files_location:
             
             # df.loc[(df['length']==10) & (df['CONTACT_DETAILS'])]
             
-            df_valid = ((df['CONTACT_DETAILS'].str.len()==10) & (df['CONTACT_DETAILS'].str.startswith('9')) | ((df['CONTACT_DETAILS'].str.len()==11) & (df['CONTACT_DETAILS'].str.startswith('0'))) | ((df['CONTACT_DETAILS'].str.len()==12) & (df['CONTACT_DETAILS'].str.startswith('6'))))
+            df['CONTACT_DETAILS'].fillna('',inplace = True)
             
-            df_invalid_phone = ~((df['CONTACT_DETAILS'].str.len()==10) & (df['CONTACT_DETAILS'].str.startswith('9')) | ((df['CONTACT_DETAILS'].str.len()==11) & (df['CONTACT_DETAILS'].str.startswith('0'))) | ((df['CONTACT_DETAILS'].str.len()==12) & (df['CONTACT_DETAILS'].str.startswith('6'))))
+            df_valid = ((df['CONTACT_DETAILS'].str.len()==10) & (df['CONTACT_DETAILS'].str.startswith('9')) | ((df['CONTACT_DETAILS'].str.len()==11) & (df['CONTACT_DETAILS'].str.startswith('0'))) | ((df['CONTACT_DETAILS'].str.len()==12) & (df['CONTACT_DETAILS'].str.startswith('6'))) | (df['CONTACT_DETAILS']==''))
+            
+            df_invalid_phone = ~((df['CONTACT_DETAILS'].str.len()==10) & (df['CONTACT_DETAILS'].str.startswith('9')) | ((df['CONTACT_DETAILS'].str.len()==11) & (df['CONTACT_DETAILS'].str.startswith('0'))) | ((df['CONTACT_DETAILS'].str.len()==12) & (df['CONTACT_DETAILS'].str.startswith('6'))) | (df['CONTACT_DETAILS']==''))
             
             # df.loc[df_valid,'valid'] = 'valid'
             
@@ -1107,107 +1109,107 @@ for i in files_location:
             
 #            hashcode chcek API
 
-            print(time.time() - start_time)
+            # print(time.time() - start_time)
                         
-            print(hello)
+            # print(hello)
                         
-            duplicate_hash_df = pd.DataFrame()
+            # duplicate_hash_df = pd.DataFrame()
             
-            duplicate_hash_list = []
+            # duplicate_hash_list = []
             
-            for xy in range(0,(len(final_df)//500)):
+            # for xy in range(0,(len(final_df)//500)):
                 
-                hash_codes = final_df['HASH_1'][(xy*500):((xy*500)+500)]
+            #     hash_codes = final_df['HASH_1'][(xy*500):((xy*500)+500)]
             
-                body = {"hashCodes":list(hash_codes)}
+            #     body = {"hashCodes":list(hash_codes)}
             
-                response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
+            #     response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
             
-                duplicate_hashcodes = response.json()     
+            #     duplicate_hashcodes = response.json()     
                 
-                print()
+            #     print()
                     
-                print(response.status_code)
+            #     print(response.status_code)
             
                 
-                # duplicate_hash = final_df[final_df['HASH_1'].isin(duplicate_hashcodes)]
+            #     # duplicate_hash = final_df[final_df['HASH_1'].isin(duplicate_hashcodes)]
                 
-                duplicate_hash_list.extend(duplicate_hashcodes)
+            #     duplicate_hash_list.extend(duplicate_hashcodes)
                 
-                # duplicate_hash_df = pd.concat([duplicate_hash_df,duplicate_hash],axis = 0)
+            #     # duplicate_hash_df = pd.concat([duplicate_hash_df,duplicate_hash],axis = 0)
                 
-                # valid_output = valid_output[~(valid_output['HASH_1'].isin(duplicate_hashcodes))]
+            #     # valid_output = valid_output[~(valid_output['HASH_1'].isin(duplicate_hashcodes))]
             
             
             
-            hash_codes = final_df[(len(final_df)//500)*500:]
+            # hash_codes = final_df[(len(final_df)//500)*500:]
             
-            body = {"hashCodes":list(hash_codes)}
+            # body = {"hashCodes":list(hash_codes)}
             
-            response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
+            # response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
             
-            duplicate_hashcodes = response.json()        
+            # duplicate_hashcodes = response.json()        
             
-            duplicate_hash_list.extend(duplicate_hashcodes)
+            # duplicate_hash_list.extend(duplicate_hashcodes)
             
-            duplicate_hash = final_df[final_df['HASH_1'].isin(duplicate_hashcodes)]
+            # duplicate_hash = final_df[final_df['HASH_1'].isin(duplicate_hashcodes)]
             
-            final_df = final_df[~(final_df['HASH_1'].isin(duplicate_hashcodes))]
+            # final_df = final_df[~(final_df['HASH_1'].isin(duplicate_hashcodes))]
             
-            duplicate_hash_df = pd.concat([duplicate_hash_df,duplicate_hash],axis = 0)
+            # duplicate_hash_df = pd.concat([duplicate_hash_df,duplicate_hash],axis = 0)
             
-            # valid_output = final_df[~(valid_output['HASH_1'].isin(duplicate_hashcodes))]
-            
-            
-            duplicate_hash_list = []
+            # # valid_output = final_df[~(valid_output['HASH_1'].isin(duplicate_hashcodes))]
             
             
-            for xy in range(0,(len(final_df)//500)):
+            # duplicate_hash_list = []
+            
+            
+            # for xy in range(0,(len(final_df)//500)):
                 
-                hash_codes = final_df['HASH_2'][(xy*500):((xy*500)+500)]
+            #     hash_codes = final_df['HASH_2'][(xy*500):((xy*500)+500)]
             
-                body = {"hashCodes":list(hash_codes)}
+            #     body = {"hashCodes":list(hash_codes)}
             
-                response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
+            #     response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
             
-                duplicate_hashcodes = response.json()     
+            #     duplicate_hashcodes = response.json()     
             
-                print()
+            #     print()
                     
-                print(response.status_code)
+            #     print(response.status_code)
                 
-                # duplicate_hash = final_df[final_df['HASH_2'].isin(duplicate_hashcodes)]
+            #     # duplicate_hash = final_df[final_df['HASH_2'].isin(duplicate_hashcodes)]
             
-                duplicate_hash_list.extend(duplicate_hashcodes)
+            #     duplicate_hash_list.extend(duplicate_hashcodes)
             
                 
-                # duplicate_hash_df = pd.concat([duplicate_hash_df,duplicate_hash],axis = 0)
+            #     # duplicate_hash_df = pd.concat([duplicate_hash_df,duplicate_hash],axis = 0)
                 
-                # valid_output = valid_output[~(valid_output['HASH_2'].isin(duplicate_hashcodes))]
+            #     # valid_output = valid_output[~(valid_output['HASH_2'].isin(duplicate_hashcodes))]
                 
                 
             
-            hash_codes = final_df[(len(final_df)//500)*500:]
+            # hash_codes = final_df[(len(final_df)//500)*500:]
             
-            body = {"hashCodes":list(hash_codes)}
+            # body = {"hashCodes":list(hash_codes)}
             
-            response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
+            # response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/getCustomerDataby3Hashcode',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body,params = {'BusinessId':'9','isCustomer':True})
             
-            duplicate_hashcodes = response.json()  
+            # duplicate_hashcodes = response.json()  
             
-            duplicate_hash_list.extend(duplicate_hashcodes)      
+            # duplicate_hash_list.extend(duplicate_hashcodes)      
             
-            duplicate_hash = final_df[final_df['HASH_2'].isin(duplicate_hash_list)]
+            # duplicate_hash = final_df[final_df['HASH_2'].isin(duplicate_hash_list)]
             
-            duplicate_hash_df = pd.concat([duplicate_hash_df,duplicate_hash],axis = 0)
+            # duplicate_hash_df = pd.concat([duplicate_hash_df,duplicate_hash],axis = 0)
             
-            # valid_output = valid_output[~(valid_output['HASH_2'].isin(duplicate_hashcodes))]
+            # # valid_output = valid_output[~(valid_output['HASH_2'].isin(duplicate_hashcodes))]
             
-            final_df = final_df[~(final_df['HASH_2'].isin(duplicate_hash_list))]
+            # final_df = final_df[~(final_df['HASH_2'].isin(duplicate_hash_list))]
             
-            duplicates = duplicate_hash_df.copy()
+            # duplicates = duplicate_hash_df.copy()
             
-            duplicates['reason'] = 'duplicates identified from system'
+            # duplicates['reason'] = 'duplicates identified from system'
             
             
             
@@ -1314,6 +1316,8 @@ for i in files_location:
             errored_df = final_df[(((final_df['EMAIL']=='') & (final_df['EMAIL_error']!='')) | ((final_df['LANDLINE_NO']=='') & (final_df['LANDLINE_NO_error']!='')) | ((final_df['EXPIRYDATE']=='') & (final_df['EXPIRYDATE_error']!='')) | ((final_df['LOAD_DT']=='') & (final_df['LOAD_DT_error']!='')) |((final_df['DATEOFBIRTH']=='') & (final_df['DATEOFBIRTH_error']!='')))]
             
             errored_df.to_csv(i.replace(config['replace_string'],config['replace_with'])+"//invalid//errored_out.csv",index  = False)
+            
+            headers_final.append('CUSTOMERADDRESS')
                         
             final_df = final_df[headers_final]
             
@@ -1350,7 +1354,7 @@ for i in files_location:
             
             #hashcode API check
             
-            invalid_records = pd.concat([invalid_records,duplicates],axis = 0)
+            # invalid_records = pd.concat([invalid_records,duplicates],axis = 0)
             
             
             #hashcode API check
@@ -1393,13 +1397,13 @@ for i in files_location:
             
             
             
-            response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/fileUploadExternalApi',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body)
+            # response = requests.post(url = 'http://mr403s0332d.palawangroup.com:4200/fileUploadExternalApi',headers = {'X-AUTH-TOKEN':'eyJ1c2VybmFtZSI6InN5c3RlbSIsInRva2VuIjoiODRjOWZmNmQtZTllMy00MWUwLWI0MDctZmY5ZGQ5YjFmYWU4In0=','Content-Type':'application/json'},json = body)
             
             # print(hello)
             
-            print(response.status_code)
+            # print(response.status_code)
             
-            upload_id = response.json()['content']['uploadId']
+            upload_id = 45
             
             
             try:
@@ -1413,7 +1417,7 @@ for i in files_location:
             
                 my_dict = json.dumps(my_dict)
             
-                producer.send(topic, value=my_dict.encode('utf-8'))
+                # producer.send(topic, value=my_dict.encode('utf-8'))
             
                 print("Message sent successfully")
              
