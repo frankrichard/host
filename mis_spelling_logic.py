@@ -14,7 +14,7 @@ config = pd.read_excel('config.xlsx',engine = 'openpyxl')
 
 config = dict(list(zip(config['key'],config['value'])))
 
-
+print('frank')
 
 
 from fuzzywuzzy import process
