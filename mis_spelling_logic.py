@@ -15,7 +15,22 @@ config = pd.read_excel('config.xlsx',engine = 'openpyxl')
 config = dict(list(zip(config['key'],config['value'])))
 
 
+
+
+from fuzzywuzzy import process
+
+
 import difflib
+
+
+
+def deduplicate_strings(strings, threshold=80):
+
+    deduped_strings = process.dedupe(strings, threshold=70)
+
+    return deduped_strings
+
+
 
 def mis_spelled_identify(row):
     
