@@ -77,7 +77,9 @@ def identify_misspelled_names(names):
 
 
 
-df = pd.read_csv('three_hash_duplicates.csv')
+
+
+df = pd.read_csv('output/three_hash.csv')
 
 final_df = df.copy()
 
@@ -87,29 +89,35 @@ group = group.reset_index()
 
 group['unique'] = ''
 
-group = group.apply(lambda row:mis_spelled_apply_function(row),axis = 1)                
-
 group.rename(columns = {'FIRSTNAME':'spell_check'},inplace = True)
+
+group = group.apply(lambda row:mis_spelled_apply_function(row),axis = 1)
 
 final_df = pd.merge(final_df,group,on = ['LASTNAME','CUSTOMERADDRESS','DATEOFBIRTH'],how = 'left')
 
 final_df['mis_spell'] = ''
 
+#                final_df = final_df.apply(lambda row:mis_spelled_apply_function(row),axis = 1)
+
 final_df = final_df.apply(lambda row:mis_spelled_identify(row),axis = 1)
 
-mis_spelled_duplicates_final = final_df[final_df['mis_spell']==0]
+print(len(final_df))
 
-final_df = final_df[final_df['mis_spell']==1]
+mis_spelled_duplicates_final = final_df[final_df['mis_spell']=='0']
 
-mis_spelled_duplicates_final['valid'] = 'invalid' 
+final_df = final_df[final_df['mis_spell']=='1']
 
-mis_spelled_duplicates_final['reason'] = 'duplicates by mis-spelling logic'
-    
+print('mis spelled',len(mis_spelled_duplicates_final))
+
+print('correct',len(final_df))
+
+#                print(final_df['valid'].value_counts())
+
+
+
 mis_spelled_duplicates_final['valid'] = 'invalid'
 
 mis_spelled_duplicates_final['reason'] = 'duplicates by mis-spelling logic'
-
-
 
 mis_spelled_duplicates_final.to_csv('mis_spelled.csv',index = False)
 
