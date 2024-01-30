@@ -31,17 +31,10 @@ def mis_spelled_identify(row):
 def mis_spelled_apply_function(row):
 
     
-    unique,duplicates = identify_misspelled_names(row['spell_check'])
+    unique = deduplicate_strings(row['spell_check'],80)
 
-    row['unqiue'] = unique
-    
-    # if ((row['FIRSTNAME'] in unique) or (len(row['spell_check'])<2)):
-        
-    #     row['mis_spell'] = '1'
-        
-    # else:
-        
-    #     row['mis_spell'] = '0'
+    row['unique'] = unique
+
 
     return row
 
